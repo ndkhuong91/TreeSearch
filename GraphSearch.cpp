@@ -3,6 +3,8 @@
 #include <iostream>
 #include <queue>
 #include <vector>
+#include <list>
+#include <algorithm>
 
 using namespace std;
 
@@ -82,15 +84,28 @@ bool goalTest(State S) {
 	return true;
 }
 
+bool operator == (State S, State S1){
+	for(int i=0;i<=2;i++)
+		for(int j=0;j<=2;j++){
+			if(S.B[i][j]!=S1.B[i][j]) return false;
+		}	
+	return true;
+}
 
+bool test_state(State S, list<State> ls){
+	list<State>::iterator sta = ls.begin();
+	for(sta;sta!=ls.end();sta++){
+		if(S == *sta) return true;
+	}
+	return false;
+}
 
 Node* treeSearch(State init_state) {
 	Node* root = new Node;
 	root->state = init_state;
 	root->parent = 0;
-	
+	list<State> closed;
 	queue<Node*> fringe;
-	
 	//push root vao fringe
 	fringe.push(root);
 
@@ -99,38 +114,48 @@ Node* treeSearch(State init_state) {
 		//lay nut dau tien cua fringe
 		Node* node = fringe.front();
 		fringe.pop();
-		
+//		printState(node->state);
+//		cout<<endl;
 		if (goalTest(node->state)) return node;
-		
-		//left
-		State new_state;
-		if (left(node->state, new_state)) {
-			child = new Node;
-			child->state = new_state;
-			child->parent = node;
-			fringe.push(child);
+		if(!test_state(node->state,closed)){//neu trang thai chua duoc xet
+			//them trang thai hien tai vao closed
+			closed.push_back(node->state);
+			
+			//left
+			State new_state;
+			if (left(node->state, new_state)) {
+				child = new Node;
+				child->state = new_state;
+				child->parent = node;
+				fringe.push(child);
+			}
+			//right
+			if (right(node->state, new_state)) {
+				child = new Node;
+				child->state = new_state;
+				child->parent = node;
+				fringe.push(child);
+			}
+			//up
+			if (up(node->state, new_state)) {
+				child = new Node;
+				child->state = new_state;
+				child->parent = node;
+				fringe.push(child);
+			}
+			//down
+			if (down(node->state, new_state)) {
+				child = new Node;
+				child->state = new_state;
+				child->parent = node;
+				fringe.push(child);
+			}
 		}
-		//right
-		if (right(node->state, new_state)) {
-			child = new Node;
-			child->state = new_state;
-			child->parent = node;
-			fringe.push(child);
-		}
-		//up
-		if (up(node->state, new_state)) {
-			child = new Node;
-			child->state = new_state;
-			child->parent = node;
-			fringe.push(child);
-		}
-		//down
-		if (down(node->state, new_state)) {
-			child = new Node;
-			child->state = new_state;
-			child->parent = node;
-			fringe.push(child);
-		}
+//		else{
+//			cout<<"nut da xet"<<endl;
+//			printState(node->state);
+//			cout<<endl;
+//		}
 	}
 	return 0; // fail
 }

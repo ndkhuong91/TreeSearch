@@ -180,9 +180,12 @@ int main() {
 	
 	
 	State state;
-	up(goal, state);
-	up(state, state);
+	left(goal, state);
 	left(state, state);
+	up(state, state);
+	up(state, state);
+	right(state, state);
+	down(state,state);
 	
 	//printState(state);
 	int i=0;
