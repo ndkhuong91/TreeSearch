@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stack>
 #include <vector>
+#include <list>
 
 using namespace std;
 
@@ -17,7 +18,7 @@ struct Node {
 };
 
 State goal;
-
+list<State> sta_els;//Luu trang thai khac nhau duoc tao ra
 
 bool left(State S, State& D) {
 	if (S.c <= 0)
@@ -83,7 +84,23 @@ bool goalTest(State S) {
 	return true;
 }
 
+bool operator == (State S, State S1){
+	for(int i=0;i<=2;i++)
+		for(int j=0;j<=2;j++){
+			if(S.B[i][j]!=S1.B[i][j]) return false;
+		}	
+	return true;
+}
 
+bool test_state(State S, list<State> ls){//Ham kiem tra trang thai hien tai da co trong list chua
+	list<State>::iterator sta = ls.begin();
+	for(sta;sta!=ls.end();sta++){
+		if(S == *sta) return true;
+	}
+	return false;
+}
+
+int sonut=0;
 
 Node* treeSearch(State init_state, int limit) {
 	Node* root = new Node;
@@ -97,7 +114,7 @@ Node* treeSearch(State init_state, int limit) {
 	
 	//push root vao fringe
 	fringe.push(root);
-	
+	sta_els.push_back(root->state);
 	Node* child;
 	
 	while (!fringe.empty()) {
@@ -123,6 +140,9 @@ Node* treeSearch(State init_state, int limit) {
 				fringe.push(child);
 				//them do sau hien tai cua nut vao depth khi node moi duoc them vao fringe
 				depth.push(limits);
+				sonut++;
+				if(!test_state(child->state,sta_els))//Neu trang thai duoc tao ra chua co trong sta_els
+					sta_els.push_back(child->state);//them trang thai vao sta_els
 			}
 			//right
 			if (right(node->state, new_state)) {
@@ -132,6 +152,9 @@ Node* treeSearch(State init_state, int limit) {
 				fringe.push(child);
 				//
 				depth.push(limits);
+				sonut++;
+				if(!test_state(child->state,sta_els))
+					sta_els.push_back(child->state);
 			}
 			//up
 			if (up(node->state, new_state)) {
@@ -141,6 +164,9 @@ Node* treeSearch(State init_state, int limit) {
 				fringe.push(child);
 				//
 				depth.push(limits);
+				sonut++;
+				if(!test_state(child->state,sta_els))
+					sta_els.push_back(child->state);
 			}
 			//down
 			if (down(node->state, new_state)) {
@@ -150,6 +176,9 @@ Node* treeSearch(State init_state, int limit) {
 				fringe.push(child);
 				//
 				depth.push(limits);
+				sonut++;
+				if(!test_state(child->state,sta_els))
+					sta_els.push_back(child->state);
 			}
 		}
 	}
@@ -158,20 +187,20 @@ Node* treeSearch(State init_state, int limit) {
 
 
 int main() {
-	State start;
-	start.B[0][0] = 7;
-	start.B[0][1] = 2;
-	start.B[0][2] = 4;
-
-	start.B[1][0] = 5;
-	start.B[1][1] = 0;
-	start.B[1][2] = 6;
-	
-	start.B[2][0] = 8;
-	start.B[2][1] = 3;
-	start.B[2][2] = 1;
-	start.r = 1;
-	start.c = 1;
+//	State start;
+//	start.B[0][0] = 7;
+//	start.B[0][1] = 2;
+//	start.B[0][2] = 4;
+//
+//	start.B[1][0] = 5;
+//	start.B[1][1] = 0;
+//	start.B[1][2] = 6;
+//	
+//	start.B[2][0] = 8;
+//	start.B[2][1] = 3;
+//	start.B[2][2] = 1;
+//	start.r = 1;
+//	start.c = 1;
 	
 	int data[] = {1,2,3,4,5,6,7,8,0};
 	memcpy(goal.B, data, 9*sizeof(int));
@@ -182,19 +211,20 @@ int main() {
 	State state;
 	left(goal, state);
 	left(state, state);
-	up(state, state);
-	up(state, state);
-	right(state, state);
-	down(state,state);
+//	up(state, state);
+//	up(state, state);
+//	left(state, state);
+//	down(state,state);
 	
-	//printState(state);
+	cout<<"Trang thai ban dau:"<<endl;
+	printState(state);
 	int i=0;
 	Node* node;
 	//Khi node tra ve == 0 => tang gioi han i va tiep tuc cho den khi co ket qua
 	while((node=treeSearch(state,i))==0){
 		i=i+1;
 	}
-	cout << "1 solution" << endl;
+	cout << "Duong di tim duoc:" << endl;
 		//lan nguoc tim loi giai
 	vector<Node*> v;
 	while (node) {
@@ -205,6 +235,8 @@ int main() {
 	
 		printState(v[i]->state);
 	}
+	cout<<endl<<"So nut sinh ra: "<<sonut+1<<endl;
+	cout<<"trang thai khac nhau duoc sinh ra:"<<sta_els.size();
 	return 0;
 }
 
